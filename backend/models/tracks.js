@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require("../config/dbConfig");
 
-const MusicTracks = sequelize.define(
-	"music_tracks",
+const Tracks = sequelize.define(
+	"tracks",
 	{
 		id: {
 			type: DataTypes.INTEGER,
@@ -35,7 +35,7 @@ const MusicTracks = sequelize.define(
 			type: DataTypes.DECIMAL,
 			allowNull: false,
 		},
-		genre: {
+		genre_id: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
 			references: {
@@ -54,4 +54,4 @@ const MusicTracks = sequelize.define(
 	},
 );
 
-module.exports = MusicTracks;
+module.exports = Tracks;

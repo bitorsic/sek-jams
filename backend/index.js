@@ -3,6 +3,7 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 const sequelize = require('./config/dbConfig');
+const associations = require("./models/associations");
 
 // // mounting all routes to '/api'
 // app.use('/api', require('./routes'));
@@ -11,6 +12,9 @@ const sequelize = require('./config/dbConfig');
 	try {
 		await sequelize.authenticate();
 		console.log("[+] Connection to database established successfully");
+
+		await sequelize.sync();
+		console.log('[+] All models were synchronized successfully');
 
 		const PORT = process.env.PORT || 3000;
 		app.listen(PORT, () => {

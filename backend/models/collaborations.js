@@ -13,7 +13,7 @@ const Collaborations = sequelize.define(
 			type: DataTypes.INTEGER,
 			allowNull: false,
 			references: {
-				model: "music_tracks",
+				model: "tracks",
 				key: "id",
 			},
 		},
