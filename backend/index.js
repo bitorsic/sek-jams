@@ -5,8 +5,7 @@ app.use(express.json());
 const sequelize = require('./config/dbConfig');
 const associations = require("./models/associations");
 
-// // mounting all routes to '/api'
-// app.use('/api', require('./routes'));
+app.use("/api/auth", require("./routes/auth"));
 
 (async () => {
 	try {

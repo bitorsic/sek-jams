@@ -34,6 +34,7 @@ const Users = sequelize.define(
 		role: {
 			type: DataTypes.ENUM(["admin", "artist", "listener"]),
 			allowNull: false,
+			defaultValue: "listener",
 		},
 		location: {
 			type: DataTypes.STRING,
