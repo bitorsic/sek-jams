@@ -9,30 +9,32 @@ const {
 } = require(".");
 
 Genres.hasMany(Tracks, { foreignKey: "genre_id" });
+Tracks.belongsTo(Genres, { foreignKey: "genre_id" });
 
-Playlists.belongsTo(Users);
+Playlists.belongsTo(Users, { foreignKey: "user_id"});
+Users.hasMany(Playlists, { foreignKey: "user_id" });
+
 Playlists.belongsToMany(Tracks, {
 	through: PlaylistTracks,
 	foreignKey: "playlist_id",
-});
-
-Tracks.belongsTo(Users);
-Tracks.belongsToMany(Users, {
-	through: Collaborations,
-	foreignKey: "track_id",
 });
 Tracks.belongsToMany(Playlists, {
 	through: PlaylistTracks,
 	foreignKey: "track_id",
 });
-Tracks.belongsTo(Genres);
 
+Tracks.belongsTo(Users, { foreignKey: "user_id" });
 Users.hasMany(Tracks, { foreignKey: "user_id" });
-Users.hasMany(Playlists, { foreignKey: "user_id" });
+
+Tracks.belongsToMany(Users, {
+	through: Collaborations,
+	foreignKey: "track_id",
+});
 Users.belongsToMany(Tracks, {
 	through: Collaborations,
 	foreignKey: "artist_id",
 });
+
 Users.belongsToMany(Users, {
 	through: Followers,
 	as: "following",

@@ -12,6 +12,10 @@ const Genres = sequelize.define(
 		name: {
 			type: DataTypes.STRING,
 			allowNull: false,
+			validate: {
+				notNull: true,
+				notEmpty: true,
+			},
 			unique: true,
 		},
 	},

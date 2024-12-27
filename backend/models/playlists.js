@@ -12,6 +12,10 @@ const Playlists = sequelize.define(
 		user_id: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
+			validate: {
+				notNull: true,
+				notEmpty: true,
+			},
 			references: {
 				model: "users",
 				key: "id",
@@ -20,6 +24,10 @@ const Playlists = sequelize.define(
 		title: {
 			type: DataTypes.STRING,
 			allowNull: false,
+			validate: {
+				notNull: true,
+				notEmpty: true,
+			},
 		},
 		description: {
 			type: DataTypes.TEXT,

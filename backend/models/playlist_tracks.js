@@ -12,6 +12,10 @@ const PlaylistTracks = sequelize.define(
 		playlist_id: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
+			validate: {
+				notNull: true,
+				notEmpty: true,
+			},
 			references: {
 				model: "playlists",
 				key: "id",
@@ -20,6 +24,10 @@ const PlaylistTracks = sequelize.define(
 		track_id: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
+			validate: {
+				notNull: true,
+				notEmpty: true,
+			},
 			references: {
 				model: "tracks",
 				key: "id",

@@ -12,6 +12,10 @@ const Tracks = sequelize.define(
 		user_id: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
+			validate: {
+				notNull: true,
+				notEmpty: true,
+			},
 			references: {
 				model: "users",
 				key: "id",
@@ -20,6 +24,10 @@ const Tracks = sequelize.define(
 		title: {
 			type: DataTypes.STRING,
 			allowNull: false,
+			validate: {
+				notNull: true,
+				notEmpty: true,
+			},
 		},
 		description: {
 			type: DataTypes.TEXT,
@@ -27,6 +35,10 @@ const Tracks = sequelize.define(
 		audio_url: {
 			type: DataTypes.STRING,
 			allowNull: false,
+			validate: {
+				notNull: true,
+				notEmpty: true,
+			},
 		},
 		cover_art_url: {
 			type: DataTypes.STRING,
@@ -34,10 +46,18 @@ const Tracks = sequelize.define(
 		length: {
 			type: DataTypes.DECIMAL,
 			allowNull: false,
+			validate: {
+				notNull: true,
+				notEmpty: true,
+			},
 		},
 		genre_id: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
+			validate: {
+				notNull: true,
+				notEmpty: true,
+			},
 			references: {
 				model: "genres",
 				key: "id",
@@ -46,10 +66,18 @@ const Tracks = sequelize.define(
 		release_date: {
 			type: DataTypes.DATE,
 			allowNull: false,
+			validate: {
+				notNull: true,
+				notEmpty: true,
+			},
 		},
 		collaboration: {
 			type: DataTypes.BOOLEAN,
 			allowNull: false,
+			validate: {
+				notNull: true,
+				notEmpty: true,
+			},
 		}
 	},
 );

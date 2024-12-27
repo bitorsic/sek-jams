@@ -12,6 +12,10 @@ const Followers = sequelize.define(
 		follower_id: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
+			validate: {
+				notNull: true,
+				notEmpty: true,
+			},
 			references: {
 				model: "users",
 				key: "id",
@@ -20,6 +24,10 @@ const Followers = sequelize.define(
 		followed_id: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
+			validate: {
+				notNull: true,
+				notEmpty: true,
+			},
 			references: {
 				model: "users",
 				key: "id",

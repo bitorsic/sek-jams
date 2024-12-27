@@ -1,27 +1,32 @@
 const jwt = require("jsonwebtoken");
 
-const verifyToken = async (req, res, next) => {
-	try {
-		let token = req.headers.authorization;
-		if (!token) {
-			return res.status(403).json({ message: "Not logged in" });
-		}
+const verifyToken = (allowedRoles = []) => {
+	return (req, res, next) => {
+		try {
+			const token = req.headers.authorization?.split(' ')[1];
+			if (!token) {
+				return res.status(403).json({ message: "Not logged in" });
+			}
+			
+			const { email, role } = jwt.verify(token, process.env.JWT_SECRET);
 
-		token = token.split(' ')[1];
-		const { email } = jwt.verify(token, process.env.JWT_SECRET);
+			if (!allowedRoles.includes(req.user.role)) {
+				return res.status(403).json({ message: "Insufficient permissions" });
+			}
 
-		req.user = { email };
-		next();
-	} catch (e) {
-		if (error.name === "JsonWebTokenError") {
-			return res.status(401).json({ message: "Invalid Token" });
+			req.user = { email };
+			next();
+		} catch (err) {
+			if (err.name === "JsonWebTokenError") {
+				return res.status(401).json({ message: "Invalid token" });
+			}
+			if (err.name === "TokenExpiredError") {
+				return res.status(401).json({ message: "Token has expired" });
+			}
+			
+			console.error(`Authentication error: ${err}`);
+			res.status(500).json({ message: `Authentication failed: ${err.message}` });
 		}
-		if (error.name === "TokenExpiredError") {
-			return res.status(401).json({ message: "Token has expired" });
-		}
-		// Default error handler
-		console.error("Authentication Error:", error);
-		res.status(500).json({ message: "Internal Server Error" });
 	}
 };
 

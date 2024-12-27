@@ -12,6 +12,10 @@ const Users = sequelize.define(
 		first_name: {
 			type: DataTypes.STRING,
 			allowNull: false,
+			validate: {
+				notNull: true,
+				notEmpty: true,
+			},
 		},
 		last_name: {
 			type: DataTypes.STRING,
@@ -19,11 +23,20 @@ const Users = sequelize.define(
 		email: {
 			type: DataTypes.STRING,
 			allowNull: false,
+			validate: {
+				notNull: true,
+				notEmpty: true,
+				isEmail: true,
+			},
 			unique: true,
 		},
 		password: {
 			type: DataTypes.STRING,
 			allowNull: false,
+			validate: {
+				notNull: true,
+				notEmpty: true,
+			},
 		},
 		profile_picture: {
 			type: DataTypes.STRING,
@@ -34,6 +47,10 @@ const Users = sequelize.define(
 		role: {
 			type: DataTypes.ENUM(["admin", "artist", "listener"]),
 			allowNull: false,
+			validate: {
+				notNull: true,
+				notEmpty: true,
+			},
 			defaultValue: "listener",
 		},
 		location: {

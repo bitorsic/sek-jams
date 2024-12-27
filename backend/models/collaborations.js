@@ -12,6 +12,10 @@ const Collaborations = sequelize.define(
 		track_id: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
+			validate: {
+				notNull: true,
+				notEmpty: true,
+			},
 			references: {
 				model: "tracks",
 				key: "id",
@@ -20,6 +24,10 @@ const Collaborations = sequelize.define(
 		artist_id: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
+			validate: {
+				notNull: true,
+				notEmpty: true,
+			},
 			references: {
 				model: "users",
 				key: "id",
@@ -28,6 +36,10 @@ const Collaborations = sequelize.define(
 		role_in_collaboration: {
 			type: DataTypes.STRING,
 			allowNull: false,
+			validate: {
+				notNull: true,
+				notEmpty: true,
+			},
 		},
 	}, 
 	{
