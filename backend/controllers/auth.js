@@ -29,7 +29,7 @@ exports.register = async (req, res) => {
 
 		// if a profile picture was provided, upload it to the s3 bucket
 		if (req.file) {
-			user.profile_picture = await s3Upload(`profile-pictures/${user.id}`, req.file);
+			user.profile_picture = await s3Upload(`public/profile-pictures/${user.id}`, req.file);
       		await user.save();
 		}
 

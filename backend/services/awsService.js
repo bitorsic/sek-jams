@@ -5,7 +5,6 @@ const s3 = new S3Client({
 		accessKeyId: process.env.AWS_ACCESS_KEY,
 		secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
 	},
-	endpoint: process.env.AWS_S3_ENDPOINT,
 	region: "ap-south-1",
 });
 
@@ -22,10 +21,7 @@ const s3Upload = async (filename, file) => {
 	const command = new PutObjectCommand(params);
 	await s3.send(command);
 
-	// stripping the initial "https://" from endpoint string
-	const strippedEndpoint = process.env.AWS_S3_ENDPOINT.replace(/^https:\/\//, '');
-
-	return `https://${process.env.AWS_S3_BUCKET_NAME}.${strippedEndpoint}/${filename}`;
+	return `https://${process.env.AWS_S3_BUCKET_NAME}.${process.env.AWS_S3_ENDPOINT}/${filename}`;
 };
 
 // takes in the filename of file to be deleted
