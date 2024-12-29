@@ -32,7 +32,7 @@ const Tracks = sequelize.define(
 		description: {
 			type: DataTypes.TEXT,
 		},
-		audio_url: {
+		audio: {
 			type: DataTypes.STRING,
 			allowNull: false,
 			validate: {
@@ -40,7 +40,7 @@ const Tracks = sequelize.define(
 				notEmpty: true,
 			},
 		},
-		cover_art_url: {
+		cover_art: {
 			type: DataTypes.STRING,
 		},
 		length: {

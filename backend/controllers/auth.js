@@ -28,8 +28,11 @@ exports.register = async (req, res) => {
 		});
 
 		// if a profile picture was provided, upload it to the s3 bucket
-		if (req.file) {
-			user.profile_picture = await s3Upload(`public/profile-pictures/${user.id}`, req.file);
+		if (req.files.profile_picture) {
+			user.profile_picture = await s3Upload(
+				`public/profile-pictures/${user.id}`, 
+				req.files.profile_picture[0], // as the key has array instead of single file
+			);
       		await user.save();
 		}
 
@@ -48,13 +51,10 @@ exports.login = async (req, res) => {
 	try {
 		const { email, password } = req.body;
 
-		const user = await users.findOne({
-			attributes: ["email", "role", "password"],
-			where: { email }
-		});
+		const user = await users.findByEmail(email);
 
 		if (!user) {
-			return res.status(400).json({ message: "User not found" });
+			return res.status(404).json({ message: "User not found" });
 		}
 
 		if (!await bcrypt.compare(password, user.password)) {
@@ -62,12 +62,12 @@ exports.login = async (req, res) => {
 		}
 
 		const token = jwt.sign(
-			{ email: user.email, role: user.role },
+			{ id: user.id, email: user.email, role: user.role },
 			process.env.JWT_SECRET,
 			{ expiresIn: "7d"},
 		)
 
-		return res.status(201).json(token);
+		return res.status(201).json({ token });
 	} catch (err) {
 		console.error(`User login error: ${err}`);
 		return res.status(500).json({ message: `User login failed: ${err.message}` });

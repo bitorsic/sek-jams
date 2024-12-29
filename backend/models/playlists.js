@@ -32,7 +32,7 @@ const Playlists = sequelize.define(
 		description: {
 			type: DataTypes.TEXT,
 		},
-		cover_art_url: {
+		cover_art: {
 			type: DataTypes.STRING,
 		},
 	},
