@@ -9,9 +9,11 @@ exports.upload = async (req, res) => {
 			collaborators,
 		} = req.body;
 
-		if (!req.file) {
+		if (!req.files.audio) {
 			return res.status(400).json({ message: "No audio file uploaded" });
 		}
+
+		
 
 	} catch (err) {
 		console.error(`Track upload error: ${err}`);

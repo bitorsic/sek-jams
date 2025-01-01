@@ -9,7 +9,7 @@ const Playlists = sequelize.define(
 			autoIncrement: true,
 			primaryKey: true,
 		},
-		user_id: {
+		creator_id: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
 			validate: {

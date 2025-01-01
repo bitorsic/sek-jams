@@ -18,22 +18,22 @@ exports.register = async (req, res) => {
 			return res.status(400).json({ message: `Password not provided` });
 		}
 		
-		let user = await users.create({
+		let userId = await users.create({
 			first_name,
 			last_name,
 			email,
-			password: await bcrypt.hash(password, 10),
+			password,
 			bio,
 			location,
 		});
 
 		// if a profile picture was provided, upload it to the s3 bucket
-		if (req.files.profile_picture) {
-			user.profile_picture = await s3Upload(
-				`public/profile-pictures/${user.id}`, 
+		if (req.files?.profile_picture) {
+			const s3Url = await s3Upload(
+				`public/profile-pictures/${userId}`, 
 				req.files.profile_picture[0], // as the key has array instead of single file
 			);
-      		await user.save();
+      		await users.updateProfilePicture(3, s3Url);
 		}
 
 		return res.status(201).json();

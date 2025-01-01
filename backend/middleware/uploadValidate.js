@@ -17,7 +17,7 @@ const uploadValidate = (rules) => {
 	return (req, res, next) => {
 		try {
 			if (!req.files || req.files.length === 0) {
-				return res.status(400).json({ message: 'No files uploaded' });
+				return next();
 			}
 
 			const errors = [];
