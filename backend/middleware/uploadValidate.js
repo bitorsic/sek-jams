@@ -1,10 +1,10 @@
 const validator = {
 	image: {
-		allowedTypes: /jpeg|jpg|png/,
+		allowedTypes: /image\/(jpeg|jpg|png|gif|bmp|webp)/,
 		maxSize: 5 * 1024 * 1024, // 5mb
 	},
 	audio: {
-		allowedTypes: /mp3|wav|flac/,
+		allowedTypes: /audio\/(mpeg|mp3|wav|flac|ogg|aac)/,
 		maxSize: 50 * 1024 * 1024, // 50mb
 	}
 }
@@ -16,13 +16,14 @@ const validator = {
 const uploadValidate = (rules) => {
 	return (req, res, next) => {
 		try {
-			if (!req.files || req.files.length === 0) {
+			if (!req.files) {
 				return next();
 			}
 
 			const errors = [];
 			Object.values(req.files).forEach((file) => {
 				file = file[0] // because each entry is an array in itself
+				console.log(file.mimetype)
 				
 				const fileType = rules[file.fieldname];
 				if (!fileType) {

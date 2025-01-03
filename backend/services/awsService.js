@@ -1,3 +1,4 @@
+// require("dotenv").config();
 const { S3Client, PutObjectCommand, DeleteObjectCommand, HeadObjectCommand } = require('@aws-sdk/client-s3');
 
 const s3 = new S3Client({
@@ -40,9 +41,7 @@ const s3Delete = async (filename) => {
 	await s3.send(command);
 }
 
-// (async () => {
-// 	await s3Delete("profile-image/user_profile_image_67694a8019339c482e748945")
-// })()
+// (async () => { await s3Delete(`public/profile-pictures/24`) })()
 
 module.exports = {
 	s3Upload,

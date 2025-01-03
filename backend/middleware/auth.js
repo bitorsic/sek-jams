@@ -8,13 +8,13 @@ const verifyToken = (allowedRoles = []) => {
 				return res.status(403).json({ message: "Not logged in" });
 			}
 			
-			const { email, role } = jwt.verify(token, process.env.JWT_SECRET);
+			const { id, role } = jwt.verify(token, process.env.JWT_SECRET);
 
-			if (!allowedRoles.includes(req.user.role)) {
+			if (!allowedRoles.includes(role)) {
 				return res.status(403).json({ message: "Insufficient permissions" });
 			}
 
-			req.user = { email };
+			req.user = { id };
 			next();
 		} catch (err) {
 			if (err.name === "JsonWebTokenError") {

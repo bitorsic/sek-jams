@@ -6,6 +6,7 @@ const sequelize = require('./config/dbConfig');
 const associations = require("./models/associations");
 
 app.use("/api/auth", require("./routes/auth"));
+app.use("/api/tracks", require("./routes/tracks"));
 
 (async () => {
 	try {

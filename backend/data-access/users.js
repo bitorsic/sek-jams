@@ -2,9 +2,16 @@ const bcrypt = require("bcrypt");
 const { Users } = require("../models");
 
 const create = async (obj) => {
-	const { password, ...rest } = obj;
-	const hashedPassword = await bcrypt.hash(password, 10);
-	const user = await Users.create({ password: hashedPassword, ...rest });
+	const inputObj = {
+		first_name: obj.first_name,
+		last_name: obj.last_name,
+		email: obj.email,
+		bio: obj.bio,
+		location: obj.location,
+	};
+
+	inputObj.password = await bcrypt.hash(obj.password, 10);
+	const user = await Users.create(inputObj);
 	return user.id;
 };
 

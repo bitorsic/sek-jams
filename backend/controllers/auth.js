@@ -4,28 +4,8 @@ const users = require("../data-access/users");
 const { s3Upload } = require("../services/awsService");
 
 exports.register = async (req, res) => {
-	try {
-		const {
-			first_name,
-			last_name,
-			email,
-			password,
-			bio,
-			location,
-		} = req.body;
-
-		if (!password) {
-			return res.status(400).json({ message: `Password not provided` });
-		}
-		
-		let userId = await users.create({
-			first_name,
-			last_name,
-			email,
-			password,
-			bio,
-			location,
-		});
+	try {		
+		let userId = await users.create(req.body);
 
 		// if a profile picture was provided, upload it to the s3 bucket
 		if (req.files?.profile_picture) {
@@ -33,13 +13,17 @@ exports.register = async (req, res) => {
 				`public/profile-pictures/${userId}`, 
 				req.files.profile_picture[0], // as the key has array instead of single file
 			);
-      		await users.updateProfilePicture(3, s3Url);
+      		await users.updateProfilePicture(userId, s3Url);
 		}
 
 		return res.status(201).json();
 	} catch (err) {
 		if (err.name === "SequelizeUniqueConstraintError") {
 			return res.status(409).json({ message: `Email already in use` });
+		}
+
+		if (err.message === "data and salt arguments required") {
+			return res.status(400).json({ message: `Password not provided` });
 		}
 
 		console.error(`User registration error: ${err}`);
@@ -62,7 +46,7 @@ exports.login = async (req, res) => {
 		}
 
 		const token = jwt.sign(
-			{ id: user.id, email: user.email, role: user.role },
+			{ id: user.id, role: user.role },
 			process.env.JWT_SECRET,
 			{ expiresIn: "7d"},
 		)

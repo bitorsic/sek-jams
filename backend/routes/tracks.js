@@ -11,3 +11,5 @@ router.post(
 	uploadValidate({ audio: "audio", cover_art: 'image' }),
 	controller.upload
 );
+
+module.exports = router;

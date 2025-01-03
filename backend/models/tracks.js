@@ -76,7 +76,6 @@ const Tracks = sequelize.define(
 			allowNull: false,
 			validate: {
 				notNull: true,
-				notEmpty: true,
 			},
 		}
 	},
