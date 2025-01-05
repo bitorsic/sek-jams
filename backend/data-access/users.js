@@ -26,8 +26,17 @@ const findByEmail = async (email) => {
 	return await Users.findOne({ where: { email }});
 };
 
+const isArtist = async (userId) => {
+	const user = await Users.findByPk(userId);
+	if (!user) throw new Error('User not found');
+
+	const allowedRoles = ['artist', 'admin'];
+	return allowedRoles.includes(user.role);
+}
+
 module.exports = {
 	create,
 	updateProfilePicture,
 	findByEmail,
+	isArtist,
 };

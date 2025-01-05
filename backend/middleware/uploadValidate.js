@@ -23,7 +23,6 @@ const uploadValidate = (rules) => {
 			const errors = [];
 			Object.values(req.files).forEach((file) => {
 				file = file[0] // because each entry is an array in itself
-				console.log(file.mimetype)
 				
 				const fileType = rules[file.fieldname];
 				if (!fileType) {

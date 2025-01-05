@@ -7,6 +7,7 @@ const associations = require("./models/associations");
 
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/tracks", require("./routes/tracks"));
+app.use("/api/genres", require("./routes/genres"));
 
 (async () => {
 	try {

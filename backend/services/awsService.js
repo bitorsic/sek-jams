@@ -41,7 +41,11 @@ const s3Delete = async (filename) => {
 	await s3.send(command);
 }
 
-// (async () => { await s3Delete(`public/profile-pictures/24`) })()
+// // Uncomment to delete user's profile picture
+// (async (user_id) => { await s3Delete(`public/profile-pictures/${user_id}`); console.log(`profile picture deleted for user id ${user_id}`);})(1);
+
+// // Uncomment to delete audio track
+// (async (track_id) => { await s3Delete(`audio-tracks/${track_id}`); console.log(`audio track deleted for track id ${track_id}`)})(1);
 
 module.exports = {
 	s3Upload,

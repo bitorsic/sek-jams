@@ -1,12 +1,18 @@
 const sequelize = require("../config/dbConfig");
 const { Tracks, Collaborations } = require("../models");
+const users = require("./users");
 const { s3Upload } = require("../services/awsService");
 
 const upload = async (artist_id, obj, audio_file) => {
 	if (obj.collaboration === "false") obj.collaboration = false;
 
+	// firstly parsing the collaborators string to json, if present
+	// collaborators should be an array of objects in the format:
+	// { "collaborator": artist_id, "role": role_in_collaboration }
+	const collaborators = JSON.parse(obj.collaborators);
+
 	if (obj.collaboration && (
-		!obj.collaborators || !Array.isArray(obj.collaborators) || obj.collaborators.length === 0
+		!collaborators || !Array.isArray(collaborators) || collaborators.length === 0
 	)) {
 		throw new Error(`collaboration is true, but no collaborators provided`);
 	}
@@ -27,7 +33,33 @@ const upload = async (artist_id, obj, audio_file) => {
 		}
 
 		const track = await Tracks.create(inputObj, { transaction: t });
+		
+		// creating collaborations if available
+		if (obj.collaboration) {
+			// firstly add the uploader as the 'original artist'
+			await Collaborations.create({ 
+				track_id: track.id,
+				artist_id,
+				role_in_collaboration: "original artist"
+			}, { transaction: t });
 
+			// then adding the rest as the specified roles
+			for (let i in collaborators) {
+				// destructure for simplicity
+				const { collaborator, role } = collaborators[i];
+
+				if (!await users.isArtist(collaborator)) {
+					throw new Error(`Collaborator with id ${collaborator} is not an artist`);
+				}
+
+				await Collaborations.create({
+					track_id: track.id,
+					artist_id: collaborator,
+					role_in_collaboration: role,
+				}, { transaction: t });
+			}
+		}
+		
 		// uploading audio file
 		const s3Url = await s3Upload(
 			`audio-tracks/${track.id}`, 
@@ -35,16 +67,6 @@ const upload = async (artist_id, obj, audio_file) => {
 		);
 		track.audio = s3Url;
 		await track.save({ transaction: t });
-
-		// creating collaborations if available
-		// TODO: test this
-		// TODO: add role check for collaborators
-		for (let i in obj.collaborators) {
-			await Collaborations.create({
-				track_id: track.id,
-				artist_id: obj.collaborators[i],
-			}, { transaction: t });
-		}
 
 		await t.commit();
 		return track.id;

@@ -11,8 +11,8 @@ const {
 Genres.hasMany(Tracks, { foreignKey: "genre_id" });
 Tracks.belongsTo(Genres, { foreignKey: "genre_id" });
 
-Playlists.belongsTo(Users, { foreignKey: "user_id"});
-Users.hasMany(Playlists, { foreignKey: "user_id" });
+Playlists.belongsTo(Users, { foreignKey: "creator_id"});
+Users.hasMany(Playlists, { foreignKey: "creator_id" });
 
 Playlists.belongsToMany(Tracks, {
 	through: PlaylistTracks,
@@ -23,8 +23,8 @@ Tracks.belongsToMany(Playlists, {
 	foreignKey: "track_id",
 });
 
-Tracks.belongsTo(Users, { foreignKey: "user_id" });
-Users.hasMany(Tracks, { foreignKey: "user_id" });
+Tracks.belongsTo(Users, { foreignKey: "artist_id" });
+Users.hasMany(Tracks, { foreignKey: "artist_id" });
 
 Tracks.belongsToMany(Users, {
 	through: Collaborations,
