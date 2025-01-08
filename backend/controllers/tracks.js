@@ -1,4 +1,5 @@
 const tracks = require("../data-access/tracks");
+const { s3Upload } = require("../services/awsService");
 
 exports.upload = async (req, res) => {
 	try {	
@@ -9,6 +10,13 @@ exports.upload = async (req, res) => {
 		const trackId = await tracks.upload(req.user.id, req.body, req.files.audio[0]);
 		
 		// uploading cover_art if present
+		if (req.files?.cover_art) {
+			const s3Url = await s3Upload(
+				`public/cover-art/track-${trackId}`, 
+				req.files.cover_art[0], // as the key has array instead of single file
+			);
+      		await tracks.updateCoverArt(trackId, s3Url);
+		}
 
 		return res.status(201).json();
 	} catch (err) {

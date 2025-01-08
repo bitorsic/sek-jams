@@ -7,7 +7,7 @@ const uploadValidate = require("../middleware/uploadValidate");
 router.post(
 	"/upload",
 	auth(["admin", "artist"]),
-	upload.fields([{ name: "audio" }, { name: "cover_art "}]),
+	upload.fields([{ name: "audio" }, { name: "cover_art"}]),
 	uploadValidate({ audio: "audio", cover_art: 'image' }),
 	controller.upload
 );

@@ -74,8 +74,16 @@ const upload = async (artist_id, obj, audio_file) => {
 		await t.rollback();
 		throw err;
 	}
-}
+};
+
+const updateCoverArt = async (trackId, s3Url) => {
+	const track = await Tracks.findByPk(trackId);
+	if (!track) throw new Error('Track not found');
+	track.cover_art = s3Url;
+	await track.save();
+};
 
 module.exports = {
 	upload,
+	updateCoverArt,
 }
