@@ -1,4 +1,5 @@
 // require("dotenv").config();
+const fs = require("fs");
 const { S3Client, PutObjectCommand, DeleteObjectCommand, HeadObjectCommand } = require('@aws-sdk/client-s3');
 
 const s3 = new S3Client({
@@ -12,15 +13,18 @@ const s3 = new S3Client({
 // takes in the filename as URL string, and the file
 // returns the URL of uploaded file on S3 if successful
 const s3Upload = async (filename, file) => {
+	const fileStream = fs.createReadStream(file.path);
+
 	const params = {
 		Bucket: process.env.AWS_S3_BUCKET_NAME,
 		Key: filename,
-		Body: file.buffer,
+		Body: fileStream,
 		ContentType: file.mimetype,
 	};
 
 	const command = new PutObjectCommand(params);
 	await s3.send(command);
+	fs.unlinkSync(file.path); // deleting the file after upload
 
 	return `https://${process.env.AWS_S3_BUCKET_NAME}.${process.env.AWS_S3_ENDPOINT}/${filename}`;
 };
@@ -46,6 +50,9 @@ const s3Delete = async (filename) => {
 
 // // Uncomment to delete audio track
 // (async (track_id) => { await s3Delete(`audio-tracks/${track_id}`); console.log(`audio track deleted for track id ${track_id}`)})(1);
+
+// // Uncomment to delete track's cover art
+// (async (track_id) => { await s3Delete(`public/cover-art/track-${track_id}`); console.log(`cover art deleted for track id ${track_id}`);})(1);
 
 module.exports = {
 	s3Upload,

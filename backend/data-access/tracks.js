@@ -2,6 +2,7 @@ const sequelize = require("../config/dbConfig");
 const { Tracks, Collaborations } = require("../models");
 const users = require("./users");
 const { s3Upload } = require("../services/awsService");
+const { getAudioLength } = require("../services/ffmpegService");
 
 const upload = async (artist_id, obj, audio_file) => {
 	if (obj.collaboration === "false") obj.collaboration = false;
@@ -26,7 +27,7 @@ const upload = async (artist_id, obj, audio_file) => {
 			title: obj.title,
 			description: obj.description,
 			audio: "404",
-			length: 0.00, // TODO: calculate audio's length
+			length: await getAudioLength(audio_file), // TODO: calculate audio's length
 			genre_id: obj.genre_id,
 			release_date: obj.release_date,
 			collaboration: obj.collaboration,
