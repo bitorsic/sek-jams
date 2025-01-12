@@ -1,6 +1,6 @@
 // require("dotenv").config();
 const fs = require("fs");
-const { S3Client, PutObjectCommand, DeleteObjectCommand, HeadObjectCommand } = require('@aws-sdk/client-s3');
+const { S3Client, PutObjectCommand, DeleteObjectCommand, HeadObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
 
 const s3 = new S3Client({
 	credentials: {
@@ -28,6 +28,28 @@ const s3Upload = async (filename, file) => {
 
 	return `https://${process.env.AWS_S3_BUCKET_NAME}.${process.env.AWS_S3_ENDPOINT}/${filename}`;
 };
+
+// returns { ContentType, ContentLength, Body }
+// the Body cannot be included in JSON response, use .pipe() on it
+const s3Download = async (filename, range) => {
+	const params = {
+		Bucket: process.env.AWS_S3_BUCKET_NAME,
+		Key: filename,
+	};
+
+	// TODO: dynamically add range to params
+
+	// this is here to verify if the file exists, and checking range later
+	// TODO: check range
+	// it throws an error with err.name === "NotFound" if the file doesn't already exist
+	let command = new HeadObjectCommand(params);
+	await s3.send(command);
+
+	command = new GetObjectCommand(params);
+	const { ContentType, ContentLength, Body } = await s3.send(command);
+	
+	return { ContentType, ContentLength, Body };
+}
 
 // takes in the filename of file to be deleted
 const s3Delete = async (filename) => {
@@ -57,4 +79,5 @@ const s3Delete = async (filename) => {
 module.exports = {
 	s3Upload,
 	s3Delete,
+	s3Download,
 }

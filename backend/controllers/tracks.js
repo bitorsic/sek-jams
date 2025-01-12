@@ -1,5 +1,5 @@
 const tracks = require("../data-access/tracks");
-const { s3Upload } = require("../services/awsService");
+const { s3Upload, s3Download } = require("../services/awsService");
 
 exports.upload = async (req, res) => {
 	try {	
@@ -22,5 +22,28 @@ exports.upload = async (req, res) => {
 	} catch (err) {
 		console.error(`Track upload error: ${err}`);
 		return res.status(500).json({ message: `Track upload failed: ${err.message}` });
+	}
+};
+
+exports.fetch = async (req, res) => {
+	try {
+		const range = req.query.range;
+
+		const getResponse = await s3Download(`audio-tracks/${req.params.trackId}`, range);
+		
+		// setting header
+		res.status(200).set({
+			'Content-Type': getResponse.ContentType,
+			'Content-Length': getResponse.ContentLength,
+		});
+
+		getResponse.Body.pipe(res);
+	} catch (err) {
+		if (err.name === "NotFound") {
+			return res.status(404).json({ message: `Track with id ${req.params.trackId} not found` });
+		}
+
+		console.error(`Track fetch error: ${err}`);
+		return res.status(500).json({ message: `Track fetch failed: ${err.message}` });
 	}
 }

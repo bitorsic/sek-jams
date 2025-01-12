@@ -12,4 +12,10 @@ router.post(
 	controller.upload
 );
 
+router.get(
+	"/:trackId", 
+	auth(["admin", "artist", "listener"]), 
+	controller.fetch
+);
+
 module.exports = router;
