@@ -27,7 +27,7 @@ const upload = async (artist_id, obj, audio_file) => {
 			title: obj.title,
 			description: obj.description,
 			audio: "404",
-			length: await getAudioLength(audio_file), // TODO: calculate audio's length
+			length: await getAudioLength(audio_file),
 			genre_id: obj.genre_id,
 			release_date: obj.release_date,
 			collaboration: obj.collaboration,

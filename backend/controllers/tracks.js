@@ -27,10 +27,28 @@ exports.upload = async (req, res) => {
 
 exports.fetch = async (req, res) => {
 	try {
-		const range = req.query.range;
+		const rangeRegex = /^bytes=\d+-\d*$/;
+		let range = req.query.range;
 
-		const getResponse = await s3Download(`audio-tracks/${req.params.trackId}`, range);
+		// format the range into an array [startByte, endByte], if provided
+		if (range) {
+			if (!rangeRegex.test(range)) {
+				return res.status(400).json({ message: `Range was provided in an invalid format` });
+			}
+
+			range = range.replace(/bytes=/, "").split("-");
+
+			// converting to number
+			range[0] = +range[0]; 
+
+			// if the end was not specified, let it be NaN for further handling
+			if (range[1] === "") { range[1] = NaN }
+			else { range[1] = +range[1] }
+		}
+
 		
+		const getResponse = await s3Download(`audio-tracks/${req.params.trackId}`, range);
+
 		// setting header
 		res.status(200).set({
 			'Content-Type': getResponse.ContentType,
@@ -41,6 +59,10 @@ exports.fetch = async (req, res) => {
 	} catch (err) {
 		if (err.name === "NotFound") {
 			return res.status(404).json({ message: `Track with id ${req.params.trackId} not found` });
+		}
+
+		if (err === "Requested range not satisfiable") {
+			return res.status(416).json({ message: err });
 		}
 
 		console.error(`Track fetch error: ${err}`);

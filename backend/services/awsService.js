@@ -31,19 +31,35 @@ const s3Upload = async (filename, file) => {
 
 // returns { ContentType, ContentLength, Body }
 // the Body cannot be included in JSON response, use .pipe() on it
+// the range is an array where [startByte, endByte]
 const s3Download = async (filename, range) => {
 	const params = {
 		Bucket: process.env.AWS_S3_BUCKET_NAME,
 		Key: filename,
 	};
 
-	// TODO: dynamically add range to params
-
-	// this is here to verify if the file exists, and checking range later
-	// TODO: check range
+	// this is here to verify if the file exists
 	// it throws an error with err.name === "NotFound" if the file doesn't already exist
 	let command = new HeadObjectCommand(params);
-	await s3.send(command);
+	const headResponse = await s3.send(command);
+
+	// checking if the range provided is within the file size
+	if (
+		range[0] >= headResponse.ContentLength || 
+		range[1] >= headResponse.ContentLength || 
+		range[1] < range[0]
+	) {
+		throw new Error(`Requested range not satisfiable`);
+	}
+
+	// if end was NaN, it refers to the last byte of the file
+	if (Number.isNaN(range[1])) { range[1] = headResponse.ContentLength - 1 }
+
+	// construct the range string
+	range = `bytes=${range[0]}-${range[1]}`;
+	
+	// dynamically add range to params
+	if (range) { params.Range = range }
 
 	command = new GetObjectCommand(params);
 	const { ContentType, ContentLength, Body } = await s3.send(command);
