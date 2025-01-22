@@ -1,5 +1,5 @@
 const sequelize = require("../config/dbConfig");
-const { Tracks, Collaborations } = require("../models");
+const { Tracks, Collaborations, Users, Genres } = require("../models");
 const users = require("./users");
 const { s3Upload } = require("../services/awsService");
 const { getAudioLength } = require("../services/ffmpegService");
@@ -37,14 +37,7 @@ const upload = async (artist_id, obj, audio_file) => {
 		
 		// creating collaborations if available
 		if (obj.collaboration) {
-			// firstly add the uploader as the 'original artist'
-			await Collaborations.create({ 
-				track_id: track.id,
-				artist_id,
-				role_in_collaboration: "original artist"
-			}, { transaction: t });
-
-			// then adding the rest as the specified roles
+			// adding the collaborators as their specific roles
 			for (let i in collaborators) {
 				// destructure for simplicity
 				const { collaborator, role } = collaborators[i];
@@ -84,7 +77,31 @@ const updateCoverArt = async (trackId, s3Url) => {
 	await track.save();
 };
 
+const findInfo = async (trackId) => {
+	const track = await Tracks.findByPk(trackId, {
+		include: [{
+			model: Users,
+			attributes: ["id", "first_name", "last_name"],
+		}, {
+			model: Genres,
+			attributes: ["name"],
+		}, {
+			model: Users,
+			as: "collaborators",
+			attributes: ["id", "first_name", "last_name"],
+			through: {
+				attributes: ["role_in_collaboration"]
+			},
+		}],
+		attributes: ["id", "title", "description", "cover_art", "length", "release_date", "collaboration"],
+	});
+	if (!track) throw new Error('Track not found');
+
+	return track.get({ plain: true })
+}
+
 module.exports = {
 	upload,
 	updateCoverArt,
+	findInfo,
 }

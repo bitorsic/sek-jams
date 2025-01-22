@@ -27,6 +27,7 @@ Tracks.belongsTo(Users, { foreignKey: "artist_id" });
 Users.hasMany(Tracks, { foreignKey: "artist_id" });
 
 Tracks.belongsToMany(Users, {
+	as: "collaborators",
 	through: Collaborations,
 	foreignKey: "track_id",
 });

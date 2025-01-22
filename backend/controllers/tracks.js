@@ -49,7 +49,7 @@ exports.fetch = async (req, res) => {
 		
 		const getResponse = await s3Download(`audio-tracks/${req.params.trackId}`, range);
 
-		// setting header
+		// setting headers
 		res.status(200).set({
 			'Content-Type': getResponse.ContentType,
 			'Content-Length': getResponse.ContentLength,
@@ -67,5 +67,37 @@ exports.fetch = async (req, res) => {
 
 		console.error(`Track fetch error: ${err}`);
 		return res.status(500).json({ message: `Track fetch failed: ${err.message}` });
+	}
+}
+
+exports.fetchInfo = async (req, res) => {
+	try {
+		const trackInfo = await tracks.findInfo(req.params.trackId);
+
+		// formatting length
+		const minutes = Math.floor(trackInfo.length / 60);
+		const seconds = trackInfo.length % 60;
+		trackInfo.length = `${minutes}:${seconds}`;
+
+		trackInfo.artist = trackInfo.user; delete trackInfo.user;
+		trackInfo.artist.name = `${trackInfo.artist.first_name} ${trackInfo.artist.last_name}`;
+		delete trackInfo.artist.first_name; delete trackInfo.artist.last_name;
+
+		trackInfo.genre = trackInfo.genre.name;
+
+		if (trackInfo.collaboration) {
+			for (let collaborator of trackInfo.collaborators) {
+				collaborator.name = `${collaborator.first_name} ${collaborator.last_name}`;
+				delete collaborator.first_name; delete collaborator.last_name;
+				collaborator.role_in_collaboration = collaborator.collaborations.role_in_collaboration;
+				delete collaborator.collaborations;
+			}
+		}
+
+		return res.status(200).json(trackInfo);
+	} catch (err) {
+		console.log(err);
+		console.error(`Track info fetch error: ${err}`);
+		return res.status(500).json({ message: `Track info fetch failed: ${err.message}` });
 	}
 }

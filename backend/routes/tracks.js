@@ -18,4 +18,10 @@ router.get(
 	controller.fetch
 );
 
+router.get(
+	"/info/:trackId",
+	auth(["admin", "artist", "listener"]),
+	controller.fetchInfo
+)
+
 module.exports = router;
