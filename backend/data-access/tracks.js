@@ -7,20 +7,10 @@ const { getAudioLength } = require("../services/ffmpegService");
 const upload = async (artist_id, obj, audio_file) => {
 	if (obj.collaboration === "false") obj.collaboration = false;
 
-	// firstly parsing the collaborators string to json, if present
-	// collaborators should be an array of objects in the format:
-	// { "collaborator": artist_id, "role": role_in_collaboration }
-	const collaborators = JSON.parse(obj.collaborators);
-
-	if (obj.collaboration && (
-		!collaborators || !Array.isArray(collaborators) || collaborators.length === 0
-	)) {
-		throw new Error(`collaboration is true, but no collaborators provided`);
-	}
-
+	
 	// starting an unmanaged transaction
 	const t = await sequelize.transaction();
-
+	
 	try {
 		const inputObj = {
 			artist_id,
@@ -32,11 +22,20 @@ const upload = async (artist_id, obj, audio_file) => {
 			release_date: obj.release_date,
 			collaboration: obj.collaboration,
 		}
-
+		
 		const track = await Tracks.create(inputObj, { transaction: t });
 		
 		// creating collaborations if available
 		if (obj.collaboration) {
+			// firstly parsing the collaborators string to json, if present
+			// collaborators should be an array of objects in the format:
+			// { "collaborator": artist_id, "role": role_in_collaboration }
+			const collaborators = JSON.parse(obj.collaborators);
+		
+			if (!collaborators || !Array.isArray(collaborators) || collaborators.length === 0) {
+				throw new Error(`collaboration is true, but no collaborators provided`);
+			}
+	
 			// adding the collaborators as their specific roles
 			for (let i in collaborators) {
 				// destructure for simplicity
